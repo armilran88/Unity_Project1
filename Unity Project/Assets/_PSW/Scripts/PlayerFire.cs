@@ -20,6 +20,17 @@ public class PlayerFire : MonoBehaviour
     AudioSource audio;
 
 
+    //오브젝트 풀링
+    //오브젝트 풀링에 사용할 최대 총알갯수
+    int poolSize = 20;
+    int fireIndex = 0;
+    //1. 배열
+    //GameObject[] bulletPool;
+    //2. 리스트
+    //public List<GameObject> bulletPool;
+    //3. 큐
+    public Queue<GameObject> bulletPool;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,14 +42,48 @@ public class PlayerFire : MonoBehaviour
 
         //오디오소스 컴포넌트 캐스팅
         audio = GetComponent<AudioSource>();
-        
+
+        //오브젝트 풀링 초기화
+        InitObjectPooling();
+
+    }
+
+    //오브젝트 풀링 초기화
+    private void InitObjectPooling()
+    {
+        //1. 배열
+        //bulletPool = new GameObject[poolSize];
+        //for(int i = 0; i < poolSize; i++)
+        //{
+        //    GameObject bullet = Instantiate(bulletFactory);
+        //    bullet.SetActive(false);
+        //    bulletPool[i] = bullet;
+        //}
+
+        //2. 리스트
+        //bulletPool = new List<GameObject>();
+        //for(int i = 0;i < poolSize; i++)
+        //{
+        //    GameObject bullet = Instantiate(bulletFactory);
+        //    bullet.SetActive(false);
+        //    bulletPool.Add(bullet);
+        //}
+
+        //3. 큐
+        bulletPool = new Queue<GameObject>();
+        for(int i = 0;i < poolSize; i++)
+        {
+            GameObject bullet = Instantiate(bulletFactory);
+            bullet.SetActive(false);
+            bulletPool.Enqueue(bullet);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Fire();
-        FireRay();
+        Fire();
+        //FireRay();
         //레이져 보여주는 기능이 활성화 되어 있을때만
         //레이져를 보여준다
         //일정시간이 지나면 레이져 보여주는 기능 비활성화
@@ -59,17 +104,69 @@ public class PlayerFire : MonoBehaviour
     public void Fire()
     {
         //마우스왼쪽버튼 or 왼쪽컨트롤 키
-        if(Input.GetButtonDown("Fire1"))
+        if(Input.GetButton("Fire1"))
         {
-            
+            //1. 배열 오브젝트풀링으로 총알발사
+            //bulletPool[fireIndex].SetActive(true);
+            //bulletPool[fireIndex].transform.position = firePoint.transform.position;
+            //bulletPool[fireIndex].transform.up = firePoint.transform.up;
+            //fireIndex++;
+            //if (fireIndex >= poolSize) fireIndex = 0;
+
+            //2. 리스트 오브젝트풀링으로 총알발사         
+            //bulletPool[fireIndex].SetActive(true);
+            //bulletPool[fireIndex].transform.position = firePoint.transform.position;
+            //bulletPool[fireIndex].transform.up = firePoint.transform.up;
+            //fireIndex++;
+            //if (fireIndex >= poolSize) fireIndex = 0;
+
+
+            //3. 리스트 오브젝트풀링으로 총알발사 (진짜 오브젝트 풀링)
+            //if(bulletPool.Count > 0)
+            //{
+            //    GameObject bullet = bulletPool[0];
+            //    bullet.SetActive(true);
+            //    bullet.transform.position = firePoint.transform.position;
+            //    bullet.transform.up = firePoint.transform.up;
+            //    //오브젝트 풀에서 빼준다
+            //    bulletPool.Remove(bullet);
+            //}
+            //else//오브젝트 풀이 비어서 총알이 하나도 없으니 풀크기를 늘려준다
+            //{
+            //    GameObject bullet = Instantiate(bulletFactory);
+            //    bullet.SetActive(false);
+            //    //오브젝트 풀에 추가한다
+            //    bulletPool.Add(bullet);
+            //}
+
+            //4. 큐 오브젝트풀링 사용하기
+            if(bulletPool.Count > 0)
+            {
+                GameObject bullet = bulletPool.Dequeue();
+                bullet.SetActive(true);
+                bullet.transform.position = firePoint.transform.position;
+                bullet.transform.up = firePoint.transform.up;
+            }
+            else
+            {
+                //총알 오브젝트 생성한다
+                GameObject bullet = Instantiate(bulletFactory);
+                bullet.SetActive(false);
+                //생성된 총알 오브젝트를 풀에 담는다
+                bulletPool.Enqueue(bullet);
+            }
+
+
+
+
             //총알공장(총알프리팹)에서 총알을 무한대로 찍어낼 수 있다
             //Instantiate() 함수로 프리팹 파일을 게임오브젝트로 만든다
 
             //총알 게임오브젝트 생성
-            GameObject bullet = Instantiate(bulletFactory);
+            //GameObject bullet = Instantiate(bulletFactory);
             //총알 오브젝트의 위치 지정
             //bullet.transform.position = transform.position;
-            bullet.transform.position = firePoint.transform.position;
+            //bullet.transform.position = firePoint.transform.position;
         }
     }
 
