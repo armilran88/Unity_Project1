@@ -9,6 +9,8 @@ public class Enemy : MonoBehaviour
 
     public float speed = 10.0f;
 
+    public GameObject fxFactory;
+
     // Update is called once per frame
     void Update()
     {
@@ -24,7 +26,16 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
         Destroy(collision.gameObject);
 
+        //이펙트보여주기
+        ShowEffect();
+
         //점수추가
         ScoreManager.Instance.AddScore();
+    }
+
+    void ShowEffect()
+    {
+        GameObject fx = Instantiate(fxFactory);
+        fx.transform.position = transform.position;
     }
 }
